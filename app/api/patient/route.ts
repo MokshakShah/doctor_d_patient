@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
             time: body.time,
           },
         },
-      }
+      } as any
     );
     // Record the payment (only if not skipped)
     if (!body.skipPayment && body.payment) {
