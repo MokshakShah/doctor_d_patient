@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   }
   const client = await connectToDB();
   const db = client.db(dbName);
-  const collectionName = locationCollections[location] || 'Patients_history_other';
+  const collectionName = locationCollections[location as keyof typeof locationCollections] || 'Patients_history_other';
   const patients = db.collection(collectionName);
   const count = await patients.countDocuments({
     'appointments.clinic': clinic,
