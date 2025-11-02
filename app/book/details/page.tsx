@@ -94,11 +94,11 @@ const PatientDetailsPage = () => {
     setError("");
     if (!validateForm()) return;
     setLoading(true);
-    // Immediately store patient details in MongoDB
+    // Immediately store patient details in MongoDB (without payment record)
     const res = await fetch("/api/patient", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, age: calculatedAge, clinic, location, date, time, payment: "pending" }),
+      body: JSON.stringify({ ...form, age: calculatedAge, clinic, location, date, time, skipPayment: true }),
     });
     const data = await res.json();
     setLoading(false);

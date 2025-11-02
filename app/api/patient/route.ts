@@ -51,17 +51,19 @@ export async function POST(req: NextRequest) {
         },
       }
     );
-    // Record the payment
-    const paymentRecord = {
-      visitNo: body.visitNo,
-      clinic: body.clinic,
-      location: body.location,
-      date: body.date,
-      time: body.time,
-      payment: body.payment,
-      createdAt: new Date(),
-    };
-    await db.collection('payment_record').insertOne(paymentRecord);
+    // Record the payment (only if not skipped)
+    if (!body.skipPayment && body.payment) {
+      const paymentRecord = {
+        visitNo: body.visitNo,
+        clinic: body.clinic,
+        location: body.location,
+        date: body.date,
+        time: body.time,
+        payment: body.payment,
+        createdAt: new Date(),
+      };
+      await db.collection('payment_record').insertOne(paymentRecord);
+    }
     return NextResponse.json({ visitNo: body.visitNo });
   }
 
@@ -94,17 +96,19 @@ export async function POST(req: NextRequest) {
   };
   await patients.insertOne(patient);
 
-  // Insert payment record in payment_record collection
-  const paymentRecord = {
-    visitNo,
-    clinic: body.clinic,
-    location: body.location,
-    date: body.date,
-    time: body.time,
-    payment: body.payment,
-    createdAt: new Date(),
-  };
-  await db.collection('payment_record').insertOne(paymentRecord);
+  // Insert payment record in payment_record collection (only if not skipped)
+  if (!body.skipPayment && body.payment) {
+    const paymentRecord = {
+      visitNo,
+      clinic: body.clinic,
+      location: body.location,
+      date: body.date,
+      time: body.time,
+      payment: body.payment,
+      createdAt: new Date(),
+    };
+    await db.collection('payment_record').insertOne(paymentRecord);
+  }
 
   return NextResponse.json({ visitNo: patient.visitNo });
 }
