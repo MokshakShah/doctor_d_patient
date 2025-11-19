@@ -35,6 +35,36 @@ export async function POST(req: NextRequest) {
   const collectionName = locationCollections[location as keyof typeof locationCollections] || 'Patients_history_other';
   const patients = db.collection(collectionName);
 
+  // Check closed days for this clinic/date before accepting booking
+  try {
+    const closedCol = db.collection('closed_days');
+  // match closed entries for All or either the clinic name or the location value
+  const cands = await closedCol.find({ $or: [{ branch: 'All' }, { branch: body.clinic }, { branch: body.location }] }).toArray();
+    if (Array.isArray(cands) && cands.length > 0 && body.date) {
+      const target = new Date(body.date);
+      const targetDay = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime();
+      for (const c of cands) {
+        if (c.date) {
+          const cd = new Date(c.date);
+          const cdDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate()).getTime();
+          if (cdDay === targetDay) {
+            return NextResponse.json({ error: 'Clinic closed on this date', reason: c.reason || '' }, { status: 400 });
+          }
+        } else if (c.dateFrom) {
+          const from = new Date(c.dateFrom);
+          const to = c.dateTo ? new Date(c.dateTo) : new Date(c.dateFrom);
+          const fromDay = new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();
+          const toDay = new Date(to.getFullYear(), to.getMonth(), to.getDate()).getTime();
+          if (targetDay >= fromDay && targetDay <= toDay) {
+            return NextResponse.json({ error: 'Clinic closed on this date', reason: c.reason || '' }, { status: 400 });
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Unable to validate closed_days before booking', err);
+  }
+
   // If visitNo is provided, treat as existing patient booking
   if (body.visitNo) {
     // Append new appointment to the patient's appointments array

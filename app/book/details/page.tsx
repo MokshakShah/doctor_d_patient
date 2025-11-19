@@ -43,6 +43,7 @@ const PatientDetailsPage = () => {
     contact?: string;
   } | null>(null);
   const [error, setError] = useState("");
+  const [closedReason, setClosedReason] = useState<string | null>(null);
   const paymentOptions = [
     { value: "cash", label: "Cash on Service" },
     { value: "online", label: "Online Payment" },
@@ -129,6 +130,10 @@ const PatientDetailsPage = () => {
   };
 
   const handleBook = async () => {
+    if (closedReason) {
+      setError(`Cannot book: ${closedReason}`);
+      return;
+    }
     if (!payment) return;
     if (isNew) {
       if (payment === 'online' || payment === 'upi') {
@@ -347,6 +352,45 @@ const PatientDetailsPage = () => {
     }
   }, [newVisitNo, payment, submitted]);
 
+  // Check closed days for this clinic/date and block booking on closed dates
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!clinic || !date) return;
+        const res = await fetch('/api/closed_days');
+        if (!res.ok) return;
+        const j = await res.json();
+        const closedArr: any[] = j.closedDays || [];
+        const target = new Date(date);
+        const targetDay = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime();
+        for (const c of closedArr) {
+          const branch = c.branch || '';
+          if (!(branch === 'All' || branch === clinic || branch === location)) continue;
+          if (c.date) {
+            const cd = new Date(c.date);
+            const cdDay = new Date(cd.getFullYear(), cd.getMonth(), cd.getDate()).getTime();
+            if (cdDay === targetDay) {
+              setClosedReason(c.reason || 'Clinic closed');
+              return;
+            }
+          } else if (c.dateFrom) {
+            const from = new Date(c.dateFrom);
+            const to = c.dateTo ? new Date(c.dateTo) : new Date(c.dateFrom);
+            const fromDay = new Date(from.getFullYear(), from.getMonth(), from.getDate()).getTime();
+            const toDay = new Date(to.getFullYear(), to.getMonth(), to.getDate()).getTime();
+            if (targetDay >= fromDay && targetDay <= toDay) {
+              setClosedReason(c.reason || 'Clinic closed');
+              return;
+            }
+          }
+        }
+        setClosedReason(null);
+      } catch (err) {
+        console.error('Failed to check closed days', err);
+      }
+    })();
+  }, [clinic, location, date]);
+
   return (
     <div className="min-h-screen bg-blue-50 flex flex-col items-center pt-6 px-2 relative">
       {/* Back Button */}
@@ -366,6 +410,12 @@ const PatientDetailsPage = () => {
         <div className="mb-2 text-sm text-gray-700">Date: <span className="font-semibold">{date}</span></div>
         <div className="mb-2 text-sm text-gray-700">Time: <span className="font-semibold">{time}</span></div>
       </div>
+      {closedReason && (
+        <div className="w-full max-w-md bg-red-50 border border-red-200 rounded-xl p-4 mb-4 text-red-700">
+          <h3 className="font-semibold">Booking unavailable</h3>
+          <p>{closedReason}</p>
+        </div>
+      )}
       {isNew === null && (
         <div className="w-full max-w-md bg-white rounded-xl shadow p-4 border border-blue-200 flex flex-col items-center">
           <p className="mb-4 text-base text-gray-700">Are you a new patient?</p>
