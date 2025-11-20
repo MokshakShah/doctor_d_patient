@@ -1,9 +1,9 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function ConfirmationPage() {
+function ConfirmationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -88,5 +88,13 @@ export default function ConfirmationPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function ConfirmationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-blue-50 flex items-center justify-center"><p>Loading confirmation...</p></div>}>
+      <ConfirmationContent />
+    </Suspense>
   );
 } 
