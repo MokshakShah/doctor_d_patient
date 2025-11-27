@@ -24,7 +24,7 @@ const Page = () => {
     const tl = gsap.timeline();
     tl.to(imgRef.current, { opacity: 1, x: 0, duration: 0.8 })
       .to(descRef.current, { opacity: 1, x: 0, duration: 0.8 }, '+=0.2');
-  }, [pathname]);
+  }, [pathname, imgRef, descRef]);
 
   return (
     <div>
