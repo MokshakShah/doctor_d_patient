@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ChevronLeft } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
@@ -17,7 +17,7 @@ const initialForm = {
   familyHistory: "",
 };
 
-const PatientDetailsPage = () => {
+const PatientDetailsContent = () => {
   const searchParams = useSearchParams();
   const clinic = searchParams.get("clinic") || "";
   const location = searchParams.get("location") || "";
@@ -588,4 +588,10 @@ const PatientDetailsPage = () => {
   );
 };
 
-export default PatientDetailsPage; 
+export default function PatientDetailsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-blue-50 flex items-center justify-center"><p>Loading...</p></div>}>
+      <PatientDetailsContent />
+    </Suspense>
+  );
+} 
