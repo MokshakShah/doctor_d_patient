@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 
 const paymentOptions = [
   { value: "cash", label: "Cash on Service" },
@@ -9,7 +9,7 @@ const paymentOptions = [
   { value: "upi", label: "UPI/QR Code" },
 ];
 
-export default function PaymentPage() {
+function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const clinic = searchParams.get("clinic") || "";
@@ -51,5 +51,13 @@ export default function PaymentPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-blue-50 flex items-center justify-center"><p>Loading...</p></div>}>
+      <PaymentContent />
+    </Suspense>
   );
 } 
