@@ -53,6 +53,7 @@ const PatientDetailsContent = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [newVisitNo, setNewVisitNo] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -130,11 +131,13 @@ const PatientDetailsContent = () => {
   };
 
   const handleBook = async () => {
+    if (isSubmitting) return; // Prevent double submission
     if (closedReason) {
       setError(`Cannot book: ${closedReason}`);
       return;
     }
     if (!payment) return;
+    setIsSubmitting(true);
     if (isNew) {
       if (payment === 'online' || payment === 'upi') {
         // Prepare success and cancel URLs
@@ -173,6 +176,7 @@ const PatientDetailsContent = () => {
           return;
         } else {
           setError('Failed to initiate payment. Please try again.');
+          setIsSubmitting(false);
           return;
         }
       } else {
@@ -188,6 +192,7 @@ const PatientDetailsContent = () => {
           setSubmitted(true);
         } else {
           setError("Failed to update patient with payment. Please try again.");
+          setIsSubmitting(false);
         }
         return;
       }
@@ -230,6 +235,7 @@ const PatientDetailsContent = () => {
         return;
       } else {
         setError('Failed to initiate payment. Please try again.');
+        setIsSubmitting(false);
         return;
       }
     } else {
@@ -252,6 +258,7 @@ const PatientDetailsContent = () => {
         setSubmitted(true);
       } else {
         setError("Failed to book appointment. Please try again.");
+        setIsSubmitting(false);
       }
     }
   };
@@ -556,10 +563,10 @@ const PatientDetailsContent = () => {
           </div>
           <button
             className="w-full bg-blue-700 text-white py-2 rounded-lg font-semibold shadow hover:bg-blue-800 transition disabled:opacity-50"
-            disabled={!payment}
+            disabled={!payment || isSubmitting}
             onClick={handleBook}
           >
-            Book
+            {isSubmitting ? 'Booking...' : 'Book'}
           </button>
         </div>
       )}
