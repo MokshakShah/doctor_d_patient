@@ -1,3 +1,48 @@
+# Doctor D Patient - Architecture Overview
+
+## System Architecture
+
+This project is the patient-facing module of the Doctor D clinic management system, built with Next.js, React, and MongoDB.
+
+---
+
+### 1. Patient Booking Portal
+- **Purpose:** Allows patients to book appointments online.
+- **Features:**
+  - New patients can register and book appointments.
+  - Returning patients use a unique Visit ID for quick booking and access to previous records.
+  - Payment options (cash/online) are tracked.
+
+---
+
+### 2. Data Flow
+- **Database:** MongoDB Atlas
+  - Stores patient profiles, visit records, and payment status.
+- **Integration:** Connects with the doctor/nurse dashboard for seamless record updates.
+
+---
+
+### 3. Security & Auth
+- **Authentication:** JWT-based login for returning patients.
+- **Environment Variables:** Used for sensitive keys (MongoDB, Stripe, etc).
+
+---
+
+### 4. Deployment
+- **Frontend & API:** Deployed on Vercel as a Next.js app.
+- **Serverless Functions:** API routes for booking, payments, and patient data.
+
+---
+
+## Summary
+- **Patient Portal:** Appointment booking, record access, payment tracking.
+- **Database:** MongoDB Atlas
+- **Deployment:** Vercel
+
+---
+
+For more details, see the codebase structure and API route documentation.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
