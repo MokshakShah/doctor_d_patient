@@ -459,6 +459,7 @@ const PatientDetailsContent = () => {
           </select>
           {formErrors.gender && <div className="text-red-500 text-xs mb-2">{formErrors.gender}</div>}
           <input name="contact" placeholder="Contact" className="w-full mb-2 p-2 border rounded" value={form.contact} onChange={handleFormChange} required inputMode="numeric" />
+          <div className="text-xs text-gray-500 mb-2">Enter your 10-digit mobile number (do not include +91)</div>
           {formErrors.contact && <div className="text-red-500 text-xs mb-2">{formErrors.contact}</div>}
           <textarea name="medicalConditions" placeholder="Medical Conditions" className="w-full mb-2 p-2 border rounded" value={form.medicalConditions} onChange={handleFormChange} required />
           <textarea name="allergy" placeholder="Allergy" className="w-full mb-2 p-2 border rounded" value={form.allergy} onChange={handleFormChange} required />
@@ -601,4 +602,4 @@ export default function PatientDetailsPage() {
       <PatientDetailsContent />
     </Suspense>
   );
-} 
+}
