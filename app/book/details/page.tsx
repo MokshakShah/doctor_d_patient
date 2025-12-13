@@ -96,11 +96,16 @@ const PatientDetailsContent = () => {
     setError("");
     if (!validateForm()) return;
     setLoading(true);
+    // Add +91 to contact if only 10 digits
+    let contactToSave = form.contact;
+    if (/^\d{10}$/.test(contactToSave)) {
+      contactToSave = '+91' + contactToSave;
+    }
     // Immediately store patient details in MongoDB (without payment record)
     const res = await fetch("/api/patient", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, age: calculatedAge, clinic, location, date, time, skipPayment: true }),
+      body: JSON.stringify({ ...form, contact: contactToSave, age: calculatedAge, clinic, location, date, time, skipPayment: true }),
     });
     const data = await res.json();
     setLoading(false);
